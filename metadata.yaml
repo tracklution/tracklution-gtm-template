@@ -1,0 +1,5 @@
+homepage: "https://www.tracklution.com"
+documentation: "https://docs.tracklution.com/"
+versions:
+  - sha: 72cd3cff5352be2c6c83cf922e05163df7930017
+    changeNotes: Initial release.
