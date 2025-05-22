@@ -1,5 +1,7 @@
 homepage: "https://www.tracklution.com"
 documentation: "https://docs.tracklution.com/"
 versions:
+  - sha: 816aee5d4d66848d6290d2c98a2ace9e83d9187c
+    changeNotes: Update help texts and labels.
   - sha: 72cd3cff5352be2c6c83cf922e05163df7930017
     changeNotes: Initial release.
