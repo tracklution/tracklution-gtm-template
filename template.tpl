@@ -119,7 +119,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "customEventName",
     "displayName": "Custom Event Name",
     "simpleValueType": true,
-    "valueHint": "e.g. SubmitApplication",
+    "valueHint": "YourCustomEventName",
     "help": "Enter the event name you want to send.",
     "valueValidators": [
       { "type": "NON_EMPTY" },
@@ -134,7 +134,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "eventValue",
     "displayName": "Event Value",
     "simpleValueType": true,
-    "valueHint": "e.g. 123.45",
+    "valueHint": "123.45",
     "help": "Optional. Non-negative decimal using a dot as the decimal separator (e.g., 123.45).",
     "valueValidators": [
       {
@@ -153,7 +153,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "eventCurrency",
     "displayName": "Event Currency",
     "simpleValueType": true,
-    "valueHint": "e.g. EUR",
+    "valueHint": "EUR",
     "help": "Optional. ISO 4217 currency code (e.g., EUR). Lowercase is accepted.",
     "valueValidators": [
       {
@@ -173,11 +173,6 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "Custom Parameters",
     "groupStyle": "ZIPPY_CLOSED",
     "subParams": [
-      {
-        "type": "LABEL",
-        "name": "customParamsHelp",
-        "displayName": "Custom parameters let you enrich the event payload with business context. For example, you could add keys like <code>content_category</code> (e.g., \"Shoes\"), <code>funnel_stage</code> (e.g., \"checkout\"), or <code>plan</code> (e.g., \"Pro\"). All custom parameters are merged into the same object sent to Tracklution and your connectors."
-      },
       {
         "type": "SIMPLE_TABLE",
         "name": "customParams",
@@ -552,10 +547,10 @@ const getEcomParams = () => {
  */
 const baseEventParams = {};
 if (data.event !== 'PageView' && data.event !== 'ContactInfo') {
-  // Value: from string to Number, non-negative
+  // Value: from string to Number, non-negative (regex validator already ensures format)
   if (getType(data.eventValue) === 'string' && data.eventValue.trim() !== '') {
-    var parsedValue = parseFloat(data.eventValue);
-    if (isFinite(parsedValue) && parsedValue >= 0) {
+    var parsedValue = data.eventValue.trim() * 1;
+    if (parsedValue >= 0) {
       baseEventParams.value = parsedValue;
     }
   }
