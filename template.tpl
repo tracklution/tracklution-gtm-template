@@ -144,8 +144,15 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "enablingConditions": [
-      { "paramName": "event", "paramValue": "PageView", "type": "NOT_EQUALS" },
-      { "paramName": "event", "paramValue": "ContactInfo", "type": "NOT_EQUALS" }
+      { "paramName": "event", "type": "EQUALS", "paramValue": "ViewContent" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "AddToCart" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "CompleteRegistration" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "StartTrial" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Subscribe" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "InitiateCheckout" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Lead" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Purchase" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "custom" }
     ]
   },
   {
@@ -163,8 +170,15 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "enablingConditions": [
-      { "paramName": "event", "paramValue": "PageView", "type": "NOT_EQUALS" },
-      { "paramName": "event", "paramValue": "ContactInfo", "type": "NOT_EQUALS" }
+      { "paramName": "event", "type": "EQUALS", "paramValue": "ViewContent" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "AddToCart" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "CompleteRegistration" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "StartTrial" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Subscribe" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "InitiateCheckout" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Lead" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Purchase" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "custom" }
     ]
   },
   {
