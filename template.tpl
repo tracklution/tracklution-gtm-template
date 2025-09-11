@@ -37,7 +37,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "TEXT",
     "name": "pixelId",
-    "displayName": "Tracking Container ID",
+    "displayName": "Tracklution ID",
     "simpleValueType": true,
     "help": "Enter the Tracking Container ID you can find in the installation instructions of your Tracklution container.",
     "valueValidators": [
@@ -53,6 +53,13 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "valueHint": "LS-12345678-9"
+  },
+  {
+    "type": "TEXT",
+    "name": "tracklutionHost",
+    "displayName": "Tracklution Domain",
+    "simpleValueType": true,
+    "valueHint": "main-1234.yourshop.com",
   },
   {
     "type": "SELECT",
@@ -106,6 +113,73 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "simpleValueType": true
+  },
+  {
+    "type": "TEXT",
+    "name": "customEventName",
+    "displayName": "Custom Event Name",
+    "simpleValueType": true,
+    "valueHint": "YourCustomEventName",
+    "help": "Enter the event name you want to send.",
+    "valueValidators": [
+      { "type": "NON_EMPTY" },
+      { "type": "REGEX", "args": ["^(?!\\s+$).+"], "errorMessage": "Please enter a non-empty name." }
+    ],
+   "enablingConditions": [
+      { "paramName": "event", "paramValue": "custom", "type": "EQUALS" }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "eventValue",
+    "displayName": "Event Value",
+    "simpleValueType": true,
+    "valueHint": "123.45",
+    "help": "Optional. Non-negative decimal using a dot as the decimal separator (e.g., 123.45).",
+    "valueValidators": [
+      {
+        "type": "REGEX",
+        "args": ["^$|^\\d+(\\.\\d+)?$"],
+        "errorMessage": "Use a non-negative decimal like 123 or 123.45 (dot as decimal separator)."
+      }
+    ],
+    "enablingConditions": [
+      { "paramName": "event", "type": "EQUALS", "paramValue": "ViewContent" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "AddToCart" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "CompleteRegistration" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "StartTrial" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Subscribe" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "InitiateCheckout" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Lead" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Purchase" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "custom" }
+    ]
+  },
+  {
+    "type": "TEXT",
+    "name": "eventCurrency",
+    "displayName": "Event Currency",
+    "simpleValueType": true,
+    "valueHint": "EUR",
+    "help": "Optional. ISO 4217 currency code (e.g., EUR). Lowercase is accepted.",
+    "valueValidators": [
+      {
+        "type": "REGEX",
+        "args": ["^$|^[A-Za-z]{3}$"],
+        "errorMessage": "Use a 3-letter currency code like EUR or usd."
+      }
+    ],
+    "enablingConditions": [
+      { "paramName": "event", "type": "EQUALS", "paramValue": "ViewContent" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "AddToCart" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "CompleteRegistration" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "StartTrial" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Subscribe" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "InitiateCheckout" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Lead" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "Purchase" },
+      { "paramName": "event", "type": "EQUALS", "paramValue": "custom" }
+    ]
   },
   {
     "type": "GROUP",
@@ -395,32 +469,6 @@ ___TEMPLATE_PARAMETERS___
         "simpleValueType": true,
         "defaultValue": "default"
       },
-      {
-        "type": "TEXT",
-        "name": "tracklutionHost",
-        "displayName": "Tracklution Hostname",
-        "simpleValueType": true,
-        "valueHint": "main-1234.trlution.com",
-        "valueValidators": [
-          {
-            "type": "NON_EMPTY"
-          },
-          {
-            "type": "REGEX",
-            "args": [
-              "^[a-z0-9-]+\\.trlution\\.com$"
-            ],
-            "errorMessage": "The hostname must be in format \u003cstrong\u003e\u0026lt;sub\u0026gt;.trlution.com\u003c/strong\u003e"
-          }
-        ],
-        "enablingConditions": [
-          {
-            "paramName": "customHost",
-            "paramValue": "tracklution",
-            "type": "EQUALS"
-          }
-        ]
-      }
     ]
   }
 ]
@@ -439,14 +487,14 @@ const logToConsole = require('logToConsole');
 const makeTableMap = require('makeTableMap');
 const setInWindow = require('setInWindow');
 
-const VERSION = '2025-04-04';
+const VERSION = '2025-09-10';
 const INIT_IDS = copyFromWindow('_tlq_gtm_ids') || [];
 
 /**
  * Constructs the URL to the Tracklution CDN script.
  * @type {string}
  */
-const CDN_URL = 'https://' + (data.tracklutionHost || 'gtm.trlution.com') + '/js/script-dynamic.js?version=' + VERSION;
+const CDN_URL = 'https://gtm.trlution.com/js/script-dynamic.js?d=' + (data.tracklutionHost || 'gtm.trlution.com') + '&version=' + VERSION;
 
 /**
  * Logs a message to the console with the Tracklution prefix.
@@ -458,8 +506,8 @@ const LOG = msg => {
 
 /**
  * Merges two objects together, with properties from source overwriting target.
- * @param {Object} target 
- * @param {Object} source 
+ * @param {Object} target
+ * @param {Object} source
  * @returns {Object} Merged object
  */
 const mergeObj = (target, source) => {
@@ -477,7 +525,7 @@ const mergeObj = (target, source) => {
  */
 const getEcomParams = () => {
   let ecomParams = {};
-  
+
   switch (data.dataSource) {
     case 'variable':
       ecomParams = getType(data.ecomVariable) === 'object' ? data.ecomVariable : {};
@@ -508,10 +556,31 @@ const getEcomParams = () => {
 };
 
 /**
- * Merged parameters from ecommerce and custom data.
+ * Optional event-level value/currency (when Event ≠ PageView and ≠ ContactInfo).
+ * These are included if set, but ecommerce/manual can overwrite them.
+ */
+const baseEventParams = {};
+if (data.event !== 'PageView' && data.event !== 'ContactInfo') {
+  // Value: from string to Number, non-negative (regex validator already ensures format)
+  if (getType(data.eventValue) === 'string' && data.eventValue.trim() !== '') {
+    var parsedValue = data.eventValue.trim() * 1;
+    if (parsedValue >= 0) {
+      baseEventParams.value = parsedValue;
+    }
+  }
+  // Currency: normalize to uppercase 3-letter code
+  if (getType(data.eventCurrency) === 'string' && data.eventCurrency.trim() !== '') {
+    baseEventParams.currency = data.eventCurrency.trim().toUpperCase();
+  }
+}
+
+/**
+ * Merged parameters from (1) optional event value/currency, (2) ecommerce/manual,
+ * and (3) custom params table. Later merges overwrite earlier keys.
+ * This ensures ecommerce/manual can overwrite value/currency when present.
  */
 const params = mergeObj(
-  getEcomParams(),
+  mergeObj(baseEventParams, getEcomParams()),
   makeTableMap(data.customParams || [], 'key', 'value')
 );
 
@@ -522,7 +591,7 @@ const params = mergeObj(
 const getTlq = () => {
   let tlq = copyFromWindow('tlq');
   if (tlq) return tlq;
-  
+
   // Initialize the 'tlq' global method to either use
   // tlq.callMethod or tlq.queue
   setInWindow('tlq', function() {
@@ -533,10 +602,10 @@ const getTlq = () => {
       callInWindow('tlq.queue.push', arguments);
     }
   });
-  
+
   aliasInWindow('_tlq', 'tlq');
   createQueue('tlq.queue');
-  
+
   return copyFromWindow('tlq');
 };
 
@@ -546,10 +615,20 @@ const tlq = getTlq();
  * Sends the event or contact info to the `tlq` function.
  */
 if (data.event !== 'ContactInfo') {
-  tlq('track', data.event, params);
+  var resolvedEventName = data.event === 'custom' ? (data.customEventName || '') : data.event;
+
+  // Safety guard — template validation should already enforce NON_EMPTY,
+  // but we fail early if somehow empty.
+  if (!resolvedEventName || ('' + resolvedEventName).trim() === '') {
+    LOG('Custom event name is required when "Custom..." is selected.');
+    data.gtmOnFailure();
+    return;
+  }
+
+  tlq('track', resolvedEventName, params);
 } else {
   const contactObj = {};
-  
+
   const fields = [
     'email', 'phoneNumber', 'firstName', 'lastName', 'birthday', 'gender',
     'address', 'postCode', 'city', 'country', 'externalId'
@@ -577,6 +656,9 @@ if (INIT_IDS.indexOf(data.pixelId) === -1) {
  * Injects the Tracklution script unless using first-party host.
  */
 if (data.customHost !== 'firstParty') {
+  if (data.tracklutionHost) {
+    setInWindow('tlq.src', CDN_URL, true);
+  }
   injectScript(
     CDN_URL,
     data.gtmOnSuccess,
@@ -705,6 +787,45 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "_tlq"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": false
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "key"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  },
+                  {
+                    "type": 1,
+                    "string": "execute"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "tlq.src"
                   },
                   {
                     "type": 8,
