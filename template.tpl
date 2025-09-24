@@ -328,7 +328,7 @@ ___TEMPLATE_PARAMETERS___
                 "macrosInSelect": true,
                 "selectItems": [],
                 "simpleValueType": true,
-                "help": "Choose a Google Tag Manager that returns an array of item objects following the \u003ca href\u003d\"https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type\u003dgtag#implementation\"\u003eGA4 schema for items\u003c/a\u003e.",
+                "help": "Select a variable that returns an array of item objects following the \u003ca href\u003d\"https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type\u003dgtag#implementation\"\u003eGA4 schema for items\u003c/a\u003e.",
                 "notSetText": "Not set"
               }
             ]
@@ -454,11 +454,6 @@ ___TEMPLATE_PARAMETERS___
             "value": "default",
             "displayValue": "Use default (gtm.trlution.com)",
             "help": "Keep this checked to load the Tracklution JavaScript from its default host, \u003cstrong\u003egtm.trlution.com\u003c/strong\u003e."
-          },
-          {
-            "value": "tracklution",
-            "displayValue": "Custom Tracklution Host",
-            "help": "If you check this, you can input a custom Tracklution CDN hostname into the field that appears. Only do this if you have been specifically instructed to use a custom hostname."
           },
           {
             "value": "firstParty",
