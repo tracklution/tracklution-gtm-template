@@ -1,6 +1,8 @@
 homepage: "https://www.tracklution.com"
 documentation: "https://docs.tracklution.com/"
 versions:
+  - sha: 801f0442b2ee1d79dd999a11c0709089766ba3c8
+    changeNotes: Update labels.
   - sha: 3f197e33870244fdcf6b98110d4b357c76d2b38d
     changeNotes: Update settings and labels.
   - sha: 30ad09d8ab9394464fae2a83fcd3425fffc53a15
