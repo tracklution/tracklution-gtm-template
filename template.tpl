@@ -448,7 +448,7 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "RADIO",
         "name": "customHost",
-        "displayName": "Main Script Loading",
+        "displayName": "Main Tag Loading",
         "radioItems": [
           {
             "value": "default",
@@ -457,7 +457,7 @@ ___TEMPLATE_PARAMETERS___
           },
           {
             "value": "firstParty",
-            "displayValue": "I have implemented main script myself",
+            "displayValue": "I'm using custom html tag or another installation method for the Main Tag",
             "help": "You \u003cstrong\u003emust\u003c/strong\u003e load the Tracklution JavaScript separately using a Custom HTML tag or similar technology \u003cstrong\u003ebefore\u003c/strong\u003e any tags built with this template fire. By checking this button, this template will not load any JavaScript libraries from Tracklution\u0027s CDN."
           }
         ],
