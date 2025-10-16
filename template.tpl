@@ -59,7 +59,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "tracklutionHost",
     "displayName": "Tracklution Domain",
     "simpleValueType": true,
-    "valueHint": "main-1234.yourshop.com",
+    "valueHint": "tralut.yourshop.com",
   },
   {
     "type": "SELECT",
@@ -448,17 +448,17 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "RADIO",
         "name": "customHost",
-        "displayName": "Customize CDN",
+        "displayName": "Main Tag Loading",
         "radioItems": [
           {
             "value": "default",
-            "displayValue": "Use default (gtm.trlution.com)",
+            "displayValue": "Automatic (default)",
             "help": "Keep this checked to load the Tracklution JavaScript from its default host, \u003cstrong\u003egtm.trlution.com\u003c/strong\u003e."
           },
           {
             "value": "firstParty",
-            "displayValue": "First-party Host",
-            "help": "If you\u0027ve enabled first-party hosting for the Tracklution JavaScript, you can check this button. You \u003cstrong\u003emust\u003c/strong\u003e load the Tracklution JavaScript separately using a Custom HTML tag or similar technology \u003cstrong\u003ebefore\u003c/strong\u003e any tags built with this template fire. By checking this button, this template will not load any JavaScript libraries from Tracklution\u0027s CDN."
+            "displayValue": "I'm using custom html tag or another installation method for the Main Tag",
+            "help": "You \u003cstrong\u003emust\u003c/strong\u003e load the Tracklution JavaScript separately using a Custom HTML tag or similar technology \u003cstrong\u003ebefore\u003c/strong\u003e any tags built with this template fire. By checking this button, this template will not load any JavaScript libraries from Tracklution\u0027s CDN."
           }
         ],
         "simpleValueType": true,
