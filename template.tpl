@@ -1,4 +1,4 @@
-﻿___TERMS_OF_SERVICE___
+___TERMS_OF_SERVICE___
 
 By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
@@ -648,9 +648,12 @@ if (INIT_IDS.indexOf(data.pixelId) === -1) {
 }
 
 /**
- * Injects the Tracklution script unless using first-party host.
+ * Injects the Tracklution script unless using first-party host
+ * or the script is already loaded by another installation method.
  */
-if (data.customHost !== 'firstParty') {
+const isScriptAlreadyLoaded = copyFromWindow('tlq.callMethod');
+
+if (data.customHost !== 'firstParty' && !isScriptAlreadyLoaded) {
   if (data.tracklutionHost) {
     setInWindow('tlq.src', CDN_URL, true);
   }
