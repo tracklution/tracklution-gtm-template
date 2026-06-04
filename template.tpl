@@ -372,9 +372,23 @@ ___TEMPLATE_PARAMETERS___
       },
       {
         "type": "TEXT",
+        "name": "emailVariants",
+        "displayName": "Email Variant",
+        "simpleValueType": true,
+        "help": "Optional. An alternative form of the email (e.g. a differently normalized or pre-hashed value) used in place of the primary email when delivering to certain ad platforms (Google Ads, Microsoft Ads, Campaign Manager 360) to improve match rates. Sent to Tracklution as emailVariants."
+      },
+      {
+        "type": "TEXT",
         "name": "phoneNumber",
         "displayName": "Phone Number",
         "simpleValueType": true
+      },
+      {
+        "type": "TEXT",
+        "name": "phoneNumberVariants",
+        "displayName": "Phone Number Variant",
+        "simpleValueType": true,
+        "help": "Optional. An alternative form of the phone number used in place of the primary phone number for ad-platform delivery. Sent to Tracklution as phoneNumberVariants."
       },
       {
         "type": "TEXT",
@@ -482,7 +496,7 @@ const logToConsole = require('logToConsole');
 const makeTableMap = require('makeTableMap');
 const setInWindow = require('setInWindow');
 
-const VERSION = '2025-09-10';
+const VERSION = '2026-06-04';
 const INIT_IDS = copyFromWindow('_tlq_gtm_ids') || [];
 
 /**
@@ -625,7 +639,8 @@ if (data.event !== 'ContactInfo') {
   const contactObj = {};
 
   const fields = [
-    'email', 'phoneNumber', 'firstName', 'lastName', 'birthday', 'gender',
+    'email', 'emailVariants', 'phoneNumber', 'phoneNumberVariants',
+    'firstName', 'lastName', 'birthday', 'gender',
     'address', 'postCode', 'city', 'country', 'externalId'
   ];
 
