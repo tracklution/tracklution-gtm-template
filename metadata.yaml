@@ -1,6 +1,8 @@
 homepage: "https://www.tracklution.com"
 documentation: "https://docs.tracklution.com/"
 versions:
+  - sha: f6320cd5aebe85dd0e3c767a0a3211bf23f77ead
+    changeNotes: Add contact info variant support.
   - sha: 801f0442b2ee1d79dd999a11c0709089766ba3c8
     changeNotes: Update labels.
   - sha: 3f197e33870244fdcf6b98110d4b357c76d2b38d
