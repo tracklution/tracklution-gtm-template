@@ -496,7 +496,7 @@ const logToConsole = require('logToConsole');
 const makeTableMap = require('makeTableMap');
 const setInWindow = require('setInWindow');
 
-const VERSION = '2026-06-04';
+const VERSION = '2026-10-12';
 const INIT_IDS = copyFromWindow('_tlq_gtm_ids') || [];
 
 /**
@@ -513,15 +513,19 @@ const LOG = msg => {
   logToConsole('[Tracklution] ' + msg);
 };
 
+const isBlank = v => v === undefined || v === null ||
+  (getType(v) === 'string' && v.trim() === '');
+
 /**
  * Merges two objects together, with properties from source overwriting target.
+ * Later merges overwrite earlier keys when they carry a non-blank value.
  * @param {Object} target
  * @param {Object} source
  * @returns {Object} Merged object
  */
 const mergeObj = (target, source) => {
   for (let key in source) {
-    if (source.hasOwnProperty(key)) {
+    if (source.hasOwnProperty(key) && !isBlank(source[key])) {
       target[key] = source[key];
     }
   }
@@ -570,12 +574,17 @@ const getEcomParams = () => {
  */
 const baseEventParams = {};
 if (data.event !== 'PageView' && data.event !== 'ContactInfo') {
-  // Value: from string to Number, non-negative (regex validator already ensures format)
-  if (getType(data.eventValue) === 'string' && data.eventValue.trim() !== '') {
-    var parsedValue = data.eventValue.trim() * 1;
-    if (parsedValue >= 0) {
-      baseEventParams.value = parsedValue;
-    }
+  // Value: accept a number or a numeric string, non-negative
+  const valueType = getType(data.eventValue);
+  let parsedValue;
+  if (valueType === 'number') {
+    parsedValue = data.eventValue;
+  } else if (valueType === 'string' && data.eventValue.trim() !== '') {
+    parsedValue = data.eventValue.trim() * 1;
+  }
+  // undefined and NaN fail the comparison, so only valid non-negative numbers pass
+  if (parsedValue >= 0) {
+    baseEventParams.value = parsedValue;
   }
   // Currency: normalize to uppercase 3-letter code
   if (getType(data.eventCurrency) === 'string' && data.eventCurrency.trim() !== '') {
@@ -585,7 +594,7 @@ if (data.event !== 'PageView' && data.event !== 'ContactInfo') {
 
 /**
  * Merged parameters from (1) optional event value/currency, (2) ecommerce/manual,
- * and (3) custom params table. Later merges overwrite earlier keys.
+ * and (3) custom params table. Later merges overwrite earlier keys when they carry a non-blank value.
  * This ensures ecommerce/manual can overwrite value/currency when present.
  */
 const params = mergeObj(
@@ -1060,7 +1069,100 @@ ___WEB_PERMISSIONS___
 
 ___TESTS___
 
-scenarios: []
+setup: |-
+  let tracked;
+  mock('copyFromWindow', key => {
+    if (key === 'tlq') {
+      return (cmd, name, params) => { if (cmd === 'track') tracked = params; };
+    }
+    return undefined;
+  });
+  mock('setInWindow', () => true);
+  mock('injectScript', (url, onSuccess) => { onSuccess(); });
+
+scenarios:
+- name: T-1 numeric Event Value is forwarded
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: 999, eventCurrency: 'inr' });
+    assertThat(tracked.value).isEqualTo(999);
+    assertThat(tracked.currency).isEqualTo('INR');
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-2 numeric string Event Value is parsed to number
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: '999.50' });
+    assertThat(tracked.value).isEqualTo(999.5);
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-3 numeric string with surrounding whitespace is parsed
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: ' 49 ' });
+    assertThat(tracked.value).isEqualTo(49);
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-4 zero numeric Event Value is forwarded
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: 0 });
+    assertThat(tracked.value).isEqualTo(0);
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-5 omitted or empty Event Value is absent
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default' });
+    assertThat(tracked.value).isUndefined();
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: '' });
+    assertThat(tracked.value).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-6 non-numeric string Event Value is absent
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: 'abc' });
+    assertThat(tracked.value).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-7 negative numeric Event Value is absent
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              eventValue: -5 });
+    assertThat(tracked.value).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-8 blank manual ecommerce fields do not overwrite Event Value and Currency
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              sendEcommerce: true, dataSource: 'manual',
+              value: '', currency: '',
+              eventValue: 999, eventCurrency: 'usd' });
+    assertThat(tracked.value).isEqualTo(999);
+    assertThat(tracked.currency).isEqualTo('USD');
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              sendEcommerce: true, dataSource: 'manual',
+              value: undefined, currency: undefined,
+              eventValue: 999, eventCurrency: 'usd' });
+    assertThat(tracked.value).isEqualTo(999);
+    assertThat(tracked.currency).isEqualTo('USD');
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-9 non-blank manual ecommerce values override Event Value and Currency
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              sendEcommerce: true, dataSource: 'manual',
+              value: '120', currency: 'EUR',
+              eventValue: 999, eventCurrency: 'usd' });
+    assertThat(tracked.value).isEqualTo('120');
+    assertThat(tracked.currency).isEqualTo('EUR');
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-10 blank custom parameter does not overwrite Event Value
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'Purchase', customHost: 'default',
+              customParams: [{ key: 'value', value: '' }],
+              eventValue: 999 });
+    assertThat(tracked.value).isEqualTo(999);
+    assertApi('gtmOnSuccess').wasCalled();
+- name: T-11 PageView event ignores Event Value
+  code: |-
+    runCode({ pixelId: 'LS-12345678-9', event: 'PageView', customHost: 'default',
+              eventValue: 999 });
+    assertThat(tracked.value).isUndefined();
+    assertApi('gtmOnSuccess').wasCalled();
 
 
 ___NOTES___
