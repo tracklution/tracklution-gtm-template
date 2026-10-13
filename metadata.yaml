@@ -1,6 +1,8 @@
 homepage: "https://www.tracklution.com"
 documentation: "https://docs.tracklution.com/"
 versions:
+  - sha: 068e71296514e6353a231a56a9702d002dc8ef55
+    changeNotes: Accept numeric Event Value; blank ecommerce fields no longer clear Event Value/Currency.
   - sha: f6320cd5aebe85dd0e3c767a0a3211bf23f77ead
     changeNotes: Add contact info variant support.
   - sha: 801f0442b2ee1d79dd999a11c0709089766ba3c8
